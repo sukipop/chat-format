@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 script_name="${0##*/}"
 format="llama3"
-line_break=0
+line_break=1
 file_input=""
 text_input=""
 
@@ -81,7 +81,13 @@ format_llama3() {
         while IFS= read -r line; do
             role=$(jq -r '.role' <<< "$line")
             content=$(jq -r '.content' <<< "$line")
-            echo -n "${start_header}${role}${stop_header}\n\n"
+
+            echo -n "${start_header}${role}${stop_header}"
+            if (( "$line_break" )); then
+                echo -e "\n\n"
+            else
+                echo -n "\n\n"
+            fi
             echo -n "${content}${eot_token}"
         done < "$file_input"
     fi
@@ -117,6 +123,11 @@ parse_arguments() {
             fi
             format="$2"
             shift
+            ;;
+
+        # Disable line breaks
+        -n)
+            line_break=0
             ;;
 
         # Handel unknown options
