@@ -15,7 +15,7 @@ print_usage() {
     echo "Options:"
     echo "  -h, --help            Display this help message."
     echo "  -f, --format <format> Prompt format to use."
-    echo "  -n                    Use line breaks
+    echo "  -n                    Use line breaks."
 }
 
 # Function to print error message
@@ -77,19 +77,19 @@ format_llama3() {
     echo -n "$bos_token"
 
     # Processes messages from the JSON file
-    if [[
+    if [[ -n "$file_input" ]]; then
         while IFS= read -r line; do
             role=$(jq -r '.role' <<< "$line")
             content=$(jq -r '.content' <<< "$line")
             echo -n "${start_header}${role}${stop_header}\n\n"
             echo -n "${content}${eot_token}"
-        done < "$input_file"
+        done < "$file_input"
     fi
 
     # Add user input if given
-    if [[ -n "$input" ]]; then
+    if [[ -n "$text_input" ]]; then
         echo -n "${start_header}user${stop_header}\n\n"
-        echo -n "${input}${eot_token}"
+        echo -n "${text_input}${eot_token}"
     fi
 
     # Add response tokens
